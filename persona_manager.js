@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Persona Manager
-// @version      1.0.0
+// @version      1.1.0
 // @description  Script to add a small persona picture on the bottom left of the screen
 // @author       Michael Mayer
 // @match        https://*.lightning.force.com/*
@@ -28,6 +28,7 @@ var personaList = [
     ];
 var currentPersona = 0;
 var shownSelectorPersona = false;
+var left = true;
 
 (function() {
 
@@ -36,11 +37,14 @@ var shownSelectorPersona = false;
         $('body').insertAdjacentHTML('afterbegin', init_html() );
         $('body').insertAdjacentHTML('afterbegin', create_persona_list() );
         $('body').insertAdjacentHTML('afterbegin', init_css() );
+        document.querySelector('#custPersona').style.left = '50px';
+        document.querySelector('#personaList').style.left = '80px';
         document.querySelector('#custPersona').addEventListener('click', toggle);
         for(var i=0;i<personaList.length;i++) {
             document.querySelector('#personaSelector'+i).addEventListener('click', togglePersona);
         }
         document.querySelector('#personaSelectorRemove').addEventListener('click', removePersona);
+        document.querySelector('#personaSelectorMove').addEventListener('click', movePersona);
     },1500);
 
 })();
@@ -73,6 +77,42 @@ function togglePersona(evt){
     let elpers = document.querySelector('#custPersona');
     elpers.style.backgroundImage = 'url("'+personaList[currentPersona].url+'")';
     elpers.style.borderColor = personaList[currentPersona].color;
+    if(left) {
+        elpers.style.left = '50px';
+        elpers.style.right = '';
+        el.style.left = '80px';
+        el.style.right = '';
+    } else {
+        elpers.style.right = '50px';
+        elpers.style.left = '';
+        el.style.right = '80px';
+        el.style.left = '';
+    }
+}
+
+function togglePersonaWithoutIndex(){
+    let el = document.querySelector('#personaList');
+    if(shownSelectorPersona) {
+        el.style.display = "none";
+    }
+    else {
+        el.style.display = "block";
+    }
+    shownSelectorPersona = !shownSelectorPersona;
+    let elpers = document.querySelector('#custPersona');
+    elpers.style.backgroundImage = 'url("'+personaList[currentPersona].url+'")';
+    elpers.style.borderColor = personaList[currentPersona].color;
+    if(left) {
+        elpers.style.left = '50px';
+        elpers.style.right = '';
+        el.style.left = '80px';
+        el.style.right = '';
+    } else {
+        elpers.style.right = '50px';
+        elpers.style.left = '';
+        el.style.right = '80px';
+        el.style.left = '';
+    }
 }
 
 function removePersona(evt){
@@ -82,13 +122,19 @@ function removePersona(evt){
     el.style.display = "none";
 }
 
+function movePersona(evt){
+    left = !left;
+    togglePersonaWithoutIndex();
+}
+
 function create_persona_list() {
   let htmlList = '<ul>';
   personaList.forEach((item, index) => {
     // Add a data-index attribute to store the item's index
     htmlList += `<li id="personaSelector${index}" data-index="${index}">${item.name}</li>`;
   });
-  htmlList += '<li id="personaSelectorRemove" data-index="99">Remove</li></ul>';
+  htmlList += '<li id="personaSelectorRemove" data-index="99">Remove</li>';
+  htmlList += '<li id="personaSelectorMove" data-index="100">Move</li></ul>';
   return '<div id="personaList">'+htmlList+'</div>';
 }
 
@@ -103,7 +149,6 @@ function init_css(){
               background-repeat: no-repeat;
               position: fixed;
               bottom: 50px;
-              left: 50px;
               border-radius: 75px;
               background-position: center;
               border-style: solid;
@@ -119,7 +164,6 @@ function init_css(){
               z-index:999999999;
               position: fixed;
               bottom: 80px;
-              left: 80px;
               background-color: white;
               display:none;
               cursor: pointer;
